@@ -8,7 +8,10 @@
 <body>
     <h1>WebSocket Client</h1>
     <input type="text" id="messageInput" placeholder="Enter message">
+    <input type="file" id="imageInput" placeholder="Enter image" accept="image/*">
+    
     <button id="sendButton">Send</button>
+    <button id="disconnectButton">Disconnect</button>
     <div id="output"></div>
 
     <script>
@@ -34,12 +37,51 @@
             console.error("WebSocket error:", error);
         };
 
+        document.getElementById("disconnectButton").addEventListener("click", () => {
+            ws.close()
+        });
+
         document.getElementById("sendButton").addEventListener("click", () => {
-            const input = document.getElementById("messageInput");
-            const message = input.value;
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            
+            const imageInput = document.getElementById("imageInput");
+            const imageValues = imageInput.files;
+
             if (message) {
-                ws.send(message); // Send message to the server
+                
+                const messageWebSocket = {
+                    type: "text",
+                    content: message,
+                    userId: 1,
+                    chatId: 1,
+                }
+
+                ws.send(JSON.stringify(messageWebSocket)); // Send message to the server
                 input.value = ""; // Clear input
+            }
+
+            if (imageValues) {
+                const image = imageInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = () => {
+                    const arrayBuffer = reader.result // The binary image data
+                    const imageObject = {
+                        type: "image",
+                        content: arrayBuffer.toString('base64'),
+                        userId: 1, 
+                        chatId: 1
+                    };
+
+                    // Convert the object to a JSON string and send it over WebSocket
+                    console.log('Sending image data inside an object...');
+                    ws.send(JSON.stringify(imageObject));  // Send the JSON string
+                };
+
+                // Read the image as ArrayBuffer
+                reader.readAsArrayBuffer(image);             
+
             }
         });
     </script>
