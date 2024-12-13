@@ -2,8 +2,13 @@ import express from 'express'
 import { WebSocketServer } from 'ws';
 import path from 'node:path'
 import morgan from 'morgan'
+import moongose from 'mongoose'
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 import chatRouter from './routes/chat.route.js';
+import authRouter from './routes/auth.route.js';
 
 
 const server = new WebSocketServer({ port: 8765 });
@@ -26,8 +31,15 @@ server.on('connection', (socket) => {
     });
 });
 
+moongose.connect(process.env.MONGODB_URI).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+});
 
 const app = express();
+app.use(express.json());
+
 app.use(morgan('dev')); // Logging
 
 app.get('/', (req, res) => {
@@ -35,6 +47,7 @@ app.get('/', (req, res) => {
     res.sendFile(filePath);
 })
 
+app.use('/auth', authRouter);
 app.use('/chats', chatRouter);
 
 app.get('/chats/id', (req, res) => {
