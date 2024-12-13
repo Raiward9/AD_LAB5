@@ -3,6 +3,8 @@ import { WebSocketServer } from 'ws';
 import path from 'node:path'
 import morgan from 'morgan'
 
+import chatRouter from './routes/chat.route.js';
+
 
 const server = new WebSocketServer({ port: 8765 });
 
@@ -32,6 +34,8 @@ app.get('/', (req, res) => {
     const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
     res.sendFile(filePath);
 })
+
+app.use('/chats', chatRouter);
 
 app.get('/chats/id', (req, res) => {
     const filePath = path.join(process.cwd(), 'chats', `chat${id}.html`);
