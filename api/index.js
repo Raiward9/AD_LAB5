@@ -8,21 +8,55 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import chatRouter from './routes/chat.route.js';
+
 import authRouter from './routes/auth.route.js';
+
+
+import { 
+    initSocketConnection,
+    disconnectSocket
+    } from './utils/sockets.js'
+import fs from 'fs'
 
 
 const server = new WebSocketServer({ port: 8765 });
 
-server.on('connection', (socket) => {
+server.on('connection', async (socket, req) => {
+    initSocketConnection(socket, req)
+
     console.log('Client connected');
 
     socket.on('message', (message) => {
-        console.log(`Received from client: ${message}`);
-        const response = `Server received: ${message}`;
-        socket.send(response); // Send response back to client
+        const messageSent = JSON.parse(message)
+
+        let response;
+        if(messageSent.type == "text") {
+            console.log(`Received from client: ${messageSent.content}`);
+            response = `Server received message: ${messageSent.content}, userId: ${messageSent.userId}, chatId: ${messageSent.chatId}`;
+            socket.send(response);
+        }
+        else if(messageSent.type == "image") {
+            const filePath = path.join(process.cwd(), 'api', 'assets', 'received_image.webp');
+            const imageData = messageSent.content
+            const buffer = Buffer.from(imageData, 'base64');
+            
+            fs.writeFile(filePath, buffer, (err) => {
+                if (err) {
+                    console.error('Error saving image:', err);
+                } else {
+                    console.log(`Image saved successfully as ${filePath}`);
+                }
+            });
+
+            console.log(`Received from client ${messageSent.userId}`)
+            response = `Server received message: ${messageSent.content}, userId: ${messageSent.userId}, chatId: ${messageSent.chatId}`;
+            socket.send(response);
+        }
+        
     });
 
     socket.on('close', () => {
+        disconnectSocket(socket)
         console.log('Client disconnected');
     });
 
@@ -55,7 +89,7 @@ app.get('/chats/id', (req, res) => {
     res.sendFile(filePath);
 })
 
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log(`Server is running on: http://localhost:${PORT}`)
 })
