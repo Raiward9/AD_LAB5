@@ -2,10 +2,24 @@ import express from 'express'
 import { WebSocketServer } from 'ws';
 import path from 'node:path'
 import morgan from 'morgan'
+import moongose from 'mongoose'
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+import chatRouter from './routes/chat.route.js';
+
+import authRouter from './routes/auth.route.js';
+
+
+import { 
+    initSocketConnection,
+    disconnectSocket
+    } from './utils/sockets.js'
 
 import fs from 'fs'
 import cryto from 'crypto'
-=======
+
 import moongose from 'mongoose'
 
 import dotenv from 'dotenv';
@@ -22,6 +36,7 @@ import {
         broadcastMessageInSocketChat 
     } from './sockets/socketManager.js';
 import { obtainQueryParamFromUrl } from './utils/sockets.js';
+
 
 
 const server = new WebSocketServer({ port: 8765 });
@@ -89,10 +104,12 @@ app.get('/', (req, res) => {
     res.sendFile(filePath);
 })
 
+
 // app.get('/chat/2/id', (req, res) => {
 //     const filePath = path.join(process.cwd(), 'chats', 'chat2.html');
 //     res.sendFile(filePath);
 // })
+
 
 app.use('/auth', authRouter);
 
