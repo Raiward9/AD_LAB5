@@ -2,18 +2,23 @@ import express from 'express'
 import { WebSocketServer } from 'ws';
 import path from 'node:path'
 import morgan from 'morgan'
+import fs from 'fs'
+import cryto from 'crypto'
 
 import chatRouter from './routes/chat.route.js';
 import { 
-    initSocketConnection,
-    disconnectSocket
-    } from './utils/sockets.js'
-import fs from 'fs'
+        initSocketConnection, 
+        disconnectSocketFromChat, 
+        broadcastMessageInSocketChat 
+    } from './sockets/socketManager.js';
+import { obtainQueryParamFromUrl } from './utils/sockets.js';
 
 const server = new WebSocketServer({ port: 8765 });
 
-server.on('connection', async (socket, req) => {
-    initSocketConnection(socket, req)
+server.on('connection', (socket, req) => {
+    const uniqueSocketIdentifier = initSocketConnection(socket, req)
+    const url = req.url
+    const chat = obtainQueryParamFromUrl(url, "chat")
 
     console.log('Client connected');
 
@@ -24,7 +29,7 @@ server.on('connection', async (socket, req) => {
         if(messageSent.type == "text") {
             console.log(`Received from client: ${messageSent.content}`);
             response = `Server received message: ${messageSent.content}, userId: ${messageSent.userId}, chatId: ${messageSent.chatId}`;
-            socket.send(response);
+            broadcastMessageInSocketChat(response, chat)
         }
         else if(messageSent.type == "image") {
             const filePath = path.join(process.cwd(), 'api', 'assets', 'received_image.webp');
@@ -47,7 +52,7 @@ server.on('connection', async (socket, req) => {
     });
 
     socket.on('close', () => {
-        disconnectSocket(socket)
+        disconnectSocketFromChat(uniqueSocketIdentifier)
         console.log('Client disconnected');
     });
 
@@ -61,9 +66,15 @@ const app = express();
 app.use(morgan('dev')); // Logging
 
 app.get('/', (req, res) => {
+    if ()
     const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
     res.sendFile(filePath);
 })
+
+// app.get('/chat/2/id', (req, res) => {
+//     const filePath = path.join(process.cwd(), 'chats', 'chat2.html');
+//     res.sendFile(filePath);
+// })
 
 app.use('/chats', chatRouter);
 

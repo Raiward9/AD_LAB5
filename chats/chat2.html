@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>WebSocket Client</h1>
-    <h2>Chat 1</h2>
+    <h2>Chat 2</h2>
     <input type="text" id="messageInput" placeholder="Enter message">
     <input type="text" id="userId" placeholder="Enter userId">
     <input type="file" id="imageInput" placeholder="Enter image" accept="image/*">
@@ -51,6 +51,7 @@
 
             if(message) {
                 userId = message
+                console.log("new user: " + userId)
             }
         });
 
@@ -91,6 +92,7 @@
 
                 // Read the image as ArrayBuffer
                 reader.readAsArrayBuffer(image);             
+
             }
         });
     </script>
