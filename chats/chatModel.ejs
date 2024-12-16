@@ -21,6 +21,7 @@
             <button id="sendButton">Send</button>
             
         </div>
+        <input id="imageInput" type="file">
     </div>
 
     <script>
@@ -31,9 +32,6 @@
             let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
             const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
 
-            console.log(userId)
-            
-
             // Cuando la conexión esté abierta
             ws.onopen = () => {
                 console.log("Connected to server");
@@ -41,8 +39,8 @@
 
             // Recibir mensajes del servidor
             ws.onmessage = (event) => {
-                console.log('Received message:', event.data);
-                const data = JSON.parse(event.data); // Asegúrate de parsear el mensaje
+                // console.log('Received message:', event.data);
+                const data = JSON.parse(event.data); 
                 const outputDiv = document.getElementById("chat-body");
                 
                 // Crear el mensaje a mostrar
@@ -52,13 +50,33 @@
                 } else {
                     newMessage.classList.add("message", "incoming");
                 }
+                
+                let messageContent;
+                if (data.type == "text") {
+                    messageContent = document.createElement("p");
+                    messageContent.textContent = `${data.userId} : ${data.message}`;
+    
+                    // Añadir el nuevo mensaje al array
+                    messages_history.push({user: data.userId, type: "text", message: messageContent.textContent});
+                }
+                else if(data.type == "image") {
 
-                const messageContent = document.createElement("p");
-                messageContent.textContent = `${data.userId} : ${data.message}`;
+                    const binary = atob(data.content)
+                    const array = new Uint8Array(binary.length)
+                    for (let i = 0; i < binary.length; ++i) {
+                        array[i] = binary.charCodeAt(i)
+                    }
+                    const blob = new Blob([array], { type: `image/${data.mimeType}` })
+                    const blobUrl = URL.createObjectURL(blob)
+                    
+                    messageContent = document.createElement("img");
+                    messageContent.src = blobUrl
 
-                // Añadir el nuevo mensaje al array
-                messages_history.push({user: data.userId, message: messageContent.textContent});
-
+                    // Añadir el nuevo mensaje al array
+                    messages_history.push({user: data.userId, type: "image", message: messageContent.src });
+                }
+                
+                console.log(messageContent)
                 newMessage.appendChild(messageContent);
                 outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
 
@@ -74,9 +92,16 @@
                         } else {
                             newMessage.classList.add("message", "incoming");
                         }
-
-                        const messageContent = document.createElement("p");
-                        messageContent.textContent = messageHist.message;
+                        
+                        let messageContent;
+                        if (messageHist.type == "text") {
+                            messageContent = document.createElement("p");
+                            messageContent.textContent = messageHist.message;
+                        }
+                        else if(messageHist.type == "image") {
+                            messageContent = document.createElement("img");
+                            messageContent.src = messageHist.message
+                        }
                         
                         newMessage.appendChild(messageContent);
                         outputDiv.appendChild(newMessage);
@@ -96,21 +121,29 @@
                 console.error("WebSocket error:", error);
             };
 
-            /*
-            // Evento para desconectar
-            document.getElementById("disconnectButton").addEventListener("click", () => {
-                ws.close(); // Cerrar la conexión WebSocket
-            });
-            */
+            let selectedFile = null
+            document.getElementById("imageInput").addEventListener("change", (event) => {
+                if (event.target.files.length > 0)
+                    selectedFile = event.target.files[0]
+                console.log(selectedFile)
+            })
+
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(",")[1])
+                    reader.onerror = reject
+                    reader.readAsDataURL(file)
+                })
+            }
+
 
             // Enviar mensajes
-            document.getElementById("sendButton").addEventListener("click", () => {
+            document.getElementById("sendButton").addEventListener("click", async () => {
                 console.log('Sending message...');
                 const messageInput = document.getElementById("messageInput");
                 const message = messageInput.value;
                 console.log('Message:', message);
-                //const imageInput = document.getElementById("imageInput");
-                //const imageValues = imageInput.files;
 
                 if (message) {
                     const messageWebSocket = {
@@ -120,6 +153,24 @@
                     };
                     ws.send(JSON.stringify(messageWebSocket)); // Enviar mensaje al servidor
                     messageInput.value = ""; // Limpiar el campo de mensaje
+                }
+                else if(selectedFile) {
+                    try {
+                        const mimeType = selectedFile.name.split('.')[1]
+                        const imageBase64 = await fileToBase64(selectedFile)
+
+                        const messageWebSocket = {
+                            type: "image",
+                            content: imageBase64,
+                            userId: userId,
+                            mimeType: mimeType
+                        }
+
+
+                        ws.send(JSON.stringify(messageWebSocket))
+                    } catch (error) {
+                        console.log("Error reading the file:", error)
+                    }
                 }
 
                 /*

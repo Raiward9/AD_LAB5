@@ -39,10 +39,12 @@ server.on('connection', (socket, req) => {
     socket.on('message', (message) => {
         const messageSent = JSON.parse(message)
 
+        console.log(messageSent)
         let response;
         if(messageSent.type == "text") {
             console.log(`Received Message: Content: ${messageSent.content} UserId: ${messageSent.userId} ChatId: ${chat}`);
             response = {
+                type: "text",
                 message: `${messageSent.content}`,
                 userId: `${messageSent.userId}`,
                 chatId: `${messageSent.chatId}`
@@ -51,21 +53,16 @@ server.on('connection', (socket, req) => {
             broadcastMessageInSocketChat(response, chat)
         }
         else if(messageSent.type == "image") {
-            const filePath = path.join(process.cwd(), 'api', 'assets', 'received_image.webp');
-            const imageData = messageSent.content
-            const buffer = Buffer.from(imageData, 'base64');
+            console.log(`Recieved image`)
+            response = {
+                type: "image",
+                content: messageSent.content,
+                mimeType: `${messageSent.mimeType}`,
+                userId: `${messageSent.userId}`,
+                chatId: `${messageSent.chatId}`
+            }
             
-            fs.writeFile(filePath, buffer, (err) => {
-                if (err) {
-                    console.error('Error saving image:', err);
-                } else {
-                    console.log(`Image saved successfully as ${filePath}`);
-                }
-            });
-
-            console.log(`Received from client ${messageSent.userId}`)
-            response = `Server received message: ${messageSent.content}, userId: ${messageSent.userId}, chatId: ${messageSent.chatId}`;
-            socket.send(response);
+            broadcastMessageInSocketChat(response, chat)
         }
         
     });
