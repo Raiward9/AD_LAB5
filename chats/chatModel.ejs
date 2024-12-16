@@ -54,7 +54,7 @@
                 messageContent.textContent = `${data.userId} : ${data.message}`;
 
                 // Añadir el nuevo mensaje al array
-                messages_history.push(messageContent);
+                messages_history.push({user: data.userId, message: messageContent.textContent});
 
                 newMessage.appendChild(messageContent);
                 outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
@@ -64,7 +64,20 @@
                     outputDiv.innerHTML = ''; // Limpiar el div
                 
                     // Añadir los últimos 10 mensajes al div
-                    messages_history.forEach(msg => outputDiv.appendChild(msg));
+                    messages_history.forEach(messageHist => {
+                        const newMessage = document.createElement("div");
+                        if (messageHist.user === userId) {
+                            newMessage.classList.add("message", "outgoing");
+                        } else {
+                            newMessage.classList.add("message", "incoming");
+                        }
+
+                        const messageContent = document.createElement("p");
+                        messageContent.textContent = messageHist.message;
+                        
+                        newMessage.appendChild(messageContent);
+                        outputDiv.appendChild(newMessage);
+                    });
                 }
 
 

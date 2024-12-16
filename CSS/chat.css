@@ -84,16 +84,16 @@
   }
   
   .chat-card .message {
-    animation: chatAnimation 0.3s ease-in-out;
+    animation: chatAnimation 0.05s ease-in-out;
     animation-fill-mode: both;
-    animation-delay: 0.1s;
+    animation-delay: 0s;
   }
   
   .chat-card .message:nth-child(even) {
-    animation-delay: 0.2s;
+    animation-delay: 0s;
   }
   
   .chat-card .message:nth-child(odd) {
-    animation-delay: 0.3s;
+    animation-delay: 0s;
   }
   
