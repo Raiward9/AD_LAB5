@@ -1,4 +1,5 @@
 import { obtainQueryParamFromUrl } from "../utils/sockets.js";
+import crypto from 'crypto'
 
 export const broadcastMessageInSocketChat = (message, chat) => {
     const uniqueSocketIdentifierInChatList = socketConnectionsInChat[chat]
@@ -14,12 +15,12 @@ export const initSocketConnection = (socket, req) => {
     const chat = obtainQueryParamFromUrl(url, 'chat')
     const userId = obtainQueryParamFromUrl(url, 'userId')
 
-    return addSocketConnection(socket, chat, userId)
+    return addSocketConnection(socket, chat)
 }
 
-export const addSocketConnection = (socket, chatId, userId) => {
+export const addSocketConnection = (socket, chatId) => {
     
-    const uniqueSocketIdentifier = generateUniqueSocketIdentifier(chatId, userId)
+    const uniqueSocketIdentifier = generateUniqueSocketIdentifier()
 
     addUniqueSocketIdentifierToChat(chatId, uniqueSocketIdentifier)
     addSocketToUniqueSocketIdentifier(socket, uniqueSocketIdentifier)
@@ -42,14 +43,12 @@ export const addSocketToUniqueSocketIdentifier = (socket, uniqueSocketIdentifier
     uniqueIdentifierToSocketConnection[uniqueSocketIdentifier] = socket
 }
 
-export const disconnectSocketFromChat = (uniqueSocketIdentifier) => {
+export const disconnectSocketFromChat = (uniqueSocketIdentifier, chat) => {
     
     // if it has already been removed or wrong input
     if (! (uniqueSocketIdentifier in uniqueIdentifierToSocketConnection)) return;
 
     // remove entry from uniqueIdentifierToSocketConnection
-    const chat = getChatFromUniqueSocketIdentifier(uniqueSocketIdentifier)
-    console.log(chat)
     delete uniqueIdentifierToSocketConnection[uniqueIdentifierToSocketConnection]
 
 
@@ -68,12 +67,8 @@ export const disconnectSocketFromChat = (uniqueSocketIdentifier) => {
     }
 }
 
-const generateUniqueSocketIdentifier = (chatId, userId) => {
-    return chatId + '.' + userId
-}
-
-const getChatFromUniqueSocketIdentifier = (uniqueIdentifierToSocketConnection) => {
-    return uniqueIdentifierToSocketConnection.split('.')[0]
+const generateUniqueSocketIdentifier = () => {
+    return crypto.randomUUID();
 }
 
 // chat -> list(uniqueSocketIdentifier of sockets connections in chat)

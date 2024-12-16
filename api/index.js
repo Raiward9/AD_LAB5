@@ -11,24 +11,8 @@ import chatRouter from './routes/chat.route.js';
 
 import authRouter from './routes/auth.route.js';
 
-
-import { 
-    initSocketConnection,
-    disconnectSocket
-    } from './utils/sockets.js'
-
 import fs from 'fs'
-import cryto from 'crypto'
-
-import moongose from 'mongoose'
-
-import dotenv from 'dotenv';
-dotenv.config();
-
-import chatRouter from './routes/chat.route.js';
-
-import authRouter from './routes/auth.route.js';
-
+import crytpo from 'crypto'
 
 import { 
         initSocketConnection, 
@@ -78,7 +62,7 @@ server.on('connection', (socket, req) => {
     });
 
     socket.on('close', () => {
-        disconnectSocketFromChat(uniqueSocketIdentifier)
+        disconnectSocketFromChat(uniqueSocketIdentifier, chat)
         console.log('Client disconnected');
     });
 
@@ -99,7 +83,6 @@ app.use(express.json());
 app.use(morgan('dev')); // Logging
 
 app.get('/', (req, res) => {
-    if ()
     const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
     res.sendFile(filePath);
 })
