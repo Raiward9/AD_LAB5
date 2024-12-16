@@ -28,8 +28,11 @@
         // Esperamos a que el DOM esté completamente cargado
         document.addEventListener("DOMContentLoaded", function() {
             // Conectar al servidor WebSocket
-            const ws = new WebSocket("ws://localhost:8765?chat=1");
             let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
+            const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
+
+            console.log(userId)
+            
 
             // Cuando la conexión esté abierta
             ws.onopen = () => {

@@ -18,8 +18,8 @@
     
     <script>
         // Connect to the WebSocket server
-        const ws = new WebSocket("ws://localhost:8765?chat=1");
         let userId = "<%= user%>";
+        const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
 
         ws.onopen = () => {
             console.log("Connected to server");

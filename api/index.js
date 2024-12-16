@@ -16,7 +16,6 @@ import authRouter from './routes/auth.route.js';
 import cookieParser from 'cookie-parser'
 
 import fs from 'fs'
-import crytpo from 'crypto'
 
 import { 
         initSocketConnection, 
@@ -33,15 +32,16 @@ server.on('connection', (socket, req) => {
     const uniqueSocketIdentifier = initSocketConnection(socket, req)
     const url = req.url
     const chat = obtainQueryParamFromUrl(url, "chat")
+    const userId = obtainQueryParamFromUrl(url, "userId")
 
-    console.log('Client connected');
+    console.log(`Client connected, User: ${userId}, Chat: ${chat}`);
 
     socket.on('message', (message) => {
         const messageSent = JSON.parse(message)
 
         let response;
         if(messageSent.type == "text") {
-            console.log(`Received from client: ${messageSent.content}`);
+            console.log(`Received Message: Content: ${messageSent.content} UserId: ${messageSent.userId} ChatId: ${chat}`);
             response = {
                 message: `${messageSent.content}`,
                 userId: `${messageSent.userId}`,
@@ -71,7 +71,7 @@ server.on('connection', (socket, req) => {
     });
 
     socket.on('close', () => {
-        disconnectSocketFromChat(uniqueSocketIdentifier, chat)
+        disconnectSocketFromChat(uniqueSocketIdentifier)
         console.log('Client disconnected');
     });
 
@@ -88,7 +88,7 @@ moongose.connect(process.env.MONGODB_URI).then(() => {
 
 const app = express();
 app.use(express.json());
-app.use(morgan('dev')); // Logging
+app.use(morgan('dev')); 
 app.use(cookieParser())
 
 app.set('view engine', 'ejs');
@@ -109,7 +109,7 @@ app.use((req, res, next) => {
       req.session.user = data
     } catch {}
   
-    next() // seguir a la siguiente ruta o middleware
+    next() 
   })
 
 app.get('/', (req, res) => {
