@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <link rel="stylesheet" href="/CSS/chat.css">
+</head>
+<body>
+    <div class="chat-card">
+        <div class="chat-header">
+            <div class="h2">Chat</div>
+        </div>
+        <div id ="chat-body" class="chat-body">
+        
+            
+        </div>
+        <div class="chat-footer">
+            <input id="messageInput" placeholder="Type your message" type="text">
+
+            <button id="sendButton">Send</button>
+            
+        </div>
+    </div>
+
+    <script>
+        let messages_history = [];
+        // Esperamos a que el DOM esté completamente cargado
+        document.addEventListener("DOMContentLoaded", function() {
+            // Conectar al servidor WebSocket
+            const ws = new WebSocket("ws://localhost:8765?chat=1");
+            let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
+
+            // Cuando la conexión esté abierta
+            ws.onopen = () => {
+                console.log("Connected to server");
+            };
+
+            // Recibir mensajes del servidor
+            ws.onmessage = (event) => {
+                console.log('Received message:', event.data);
+                const data = JSON.parse(event.data); // Asegúrate de parsear el mensaje
+                const outputDiv = document.getElementById("chat-body");
+                
+                // Crear el mensaje a mostrar
+                const newMessage = document.createElement("div");
+                if (data.userId === userId) {
+                    newMessage.classList.add("message", "outgoing");
+                } else {
+                    newMessage.classList.add("message", "incoming");
+                }
+
+                const messageContent = document.createElement("p");
+                messageContent.textContent = `${data.userId} : ${data.message}`;
+
+                // Añadir el nuevo mensaje al array
+                messages_history.push(messageContent);
+
+                newMessage.appendChild(messageContent);
+                outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
+
+                if (messages_history.length > 10) {
+                    messages_history.shift();
+                    outputDiv.innerHTML = ''; // Limpiar el div
+                
+                    // Añadir los últimos 10 mensajes al div
+                    messages_history.forEach(msg => outputDiv.appendChild(msg));
+                }
+
+
+            };
+
+            // Cuando la conexión se cierre
+            ws.onclose = () => {
+                console.log("Disconnected from server");
+            };
+
+            // Manejar errores de WebSocket
+            ws.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+
+            /*
+            // Evento para desconectar
+            document.getElementById("disconnectButton").addEventListener("click", () => {
+                ws.close(); // Cerrar la conexión WebSocket
+            });
+            */
+
+            // Enviar mensajes
+            document.getElementById("sendButton").addEventListener("click", () => {
+                console.log('Sending message...');
+                const messageInput = document.getElementById("messageInput");
+                const message = messageInput.value;
+                console.log('Message:', message);
+                //const imageInput = document.getElementById("imageInput");
+                //const imageValues = imageInput.files;
+
+                if (message) {
+                    const messageWebSocket = {
+                        type: "text",
+                        content: message,
+                        userId: userId
+                    };
+                    ws.send(JSON.stringify(messageWebSocket)); // Enviar mensaje al servidor
+                    messageInput.value = ""; // Limpiar el campo de mensaje
+                }
+
+                /*
+                if (imageValues.length > 0) {
+                    const image = imageValues[0];
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        const arrayBuffer = reader.result; // Los datos binarios de la imagen
+                        const imageObject = {
+                            type: "image",
+                            content: arrayBuffer.toString('base64') // Convertir la imagen a base64
+                        };
+
+                        // Enviar los datos de la imagen
+                        console.log('Sending image data inside an object...');
+                        ws.send(JSON.stringify(imageObject));  // Enviar la imagen en formato JSON
+                    };
+
+                    // Leer la imagen como ArrayBuffer
+                    reader.readAsArrayBuffer(image);
+                }
+                */
+            });
+        });
+    </script>
+</body>
+</html>

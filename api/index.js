@@ -5,11 +5,15 @@ import morgan from 'morgan'
 import moongose from 'mongoose'
 
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+
+
 dotenv.config();
 
 import chatRouter from './routes/chat.route.js';
 
 import authRouter from './routes/auth.route.js';
+import cookieParser from 'cookie-parser'
 
 import fs from 'fs'
 import crytpo from 'crypto'
@@ -38,7 +42,12 @@ server.on('connection', (socket, req) => {
         let response;
         if(messageSent.type == "text") {
             console.log(`Received from client: ${messageSent.content}`);
-            response = `Server received message: ${messageSent.content}, userId: ${messageSent.userId}, chatId: ${messageSent.chatId}`;
+            response = {
+                message: `${messageSent.content}`,
+                userId: `${messageSent.userId}`,
+                chatId: `${messageSent.chatId}`
+            }
+            console.log("RESP:", response)   
             broadcastMessageInSocketChat(response, chat)
         }
         else if(messageSent.type == "image") {
@@ -79,11 +88,50 @@ moongose.connect(process.env.MONGODB_URI).then(() => {
 
 const app = express();
 app.use(express.json());
-
 app.use(morgan('dev')); // Logging
+app.use(cookieParser())
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(process.cwd(), 'chats'));
+
+app.use('/CSS', express.static(path.join(process.cwd(), 'CSS')));
+
+app.use((req, res, next) => {
+    const token = req.cookies.access_token
+
+    let data = null
+  
+    req.session = { user: null }
+  
+    try {
+      data = jwt.verify(token, process.env.JWT_SECRET)
+      console.log(data)
+      req.session.user = data
+    } catch {}
+  
+    next() // seguir a la siguiente ruta o middleware
+  })
 
 app.get('/', (req, res) => {
-    const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
+    const { user } = req.session
+    if (!user) {
+        //console.log(req.session.user)
+        return res.redirect('/signin')
+    }
+
+    //const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
+    //res.sendFile(filePath);
+    res.render('chatModel', { user: user.username });
+})
+
+app.get('/signin', (req, res) => {
+    const filePath = path.join(process.cwd(), 'frontend', 'login.html');
+    //const CSSpath = path.join(process.cwd(), 'CSS', 'login.css');
+    res.sendFile(filePath);
+})
+
+app.get('/signup', (req, res) => {
+    const filePath = path.join(process.cwd(), 'frontend', 'register.html');
     res.sendFile(filePath);
 })
 

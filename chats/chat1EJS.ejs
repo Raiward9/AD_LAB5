@@ -14,12 +14,12 @@
     
     <button id="sendButton">Send</button>
     <button id="disconnectButton">Disconnect</button>
-    <button id="ChangeUserIdButton">Change User Id</button>
     <div id="output"></div>
+    
     <script>
         // Connect to the WebSocket server
         const ws = new WebSocket("ws://localhost:8765?chat=1");
-        let userId = "1";
+        let userId = "<%= user%>";
 
         ws.onopen = () => {
             console.log("Connected to server");
@@ -44,15 +44,6 @@
             ws.close()
         });
 
-        document.getElementById("ChangeUserIdButton").addEventListener("click", () => {
-            const messageInput = document.getElementById("userId");
-            const message = messageInput.value;
-
-            if(message) {
-                userId = message
-            }
-        });
-
         document.getElementById("sendButton").addEventListener("click", () => {
             const messageInput = document.getElementById("messageInput");
             const message = messageInput.value;
@@ -69,10 +60,11 @@
                 }
 
                 ws.send(JSON.stringify(messageWebSocket)); // Send message to the server
-                input.value = ""; // Clear input
+                messageInput.value = ""; // Clear input
             }
 
-            if (imageValues) {
+            //console.log(imageValues.length);
+            if (imageValues > 0) {
                 const image = imageInput.files[0];
                 const reader = new FileReader();
                 

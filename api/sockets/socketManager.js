@@ -6,7 +6,7 @@ export const broadcastMessageInSocketChat = (message, chat) => {
     console.log(uniqueSocketIdentifierInChatList)
     uniqueSocketIdentifierInChatList.forEach(uniqueSocketIdentifierInChat => {
         const socket = uniqueIdentifierToSocketConnection[uniqueSocketIdentifierInChat]
-        socket.send(message)
+        socket.send(JSON.stringify(message))
     });
 }
 

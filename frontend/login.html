@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="/CSS/login.css">
+</head>
+<body>
+    <form id="loginForm" class="form">
+       <p class="form-title">Sign in to your account</p>
+        <div class="input-container">
+          <input type="text" placeholder="Enter username" id="username" name="username" required>
+          <span>
+          </span>
+      </div>
+      <div class="input-container">
+          <input type="password" placeholder="Enter password" id="password" required>
+        </div>
+         <button type="submit" class="submit">
+        Sign in
+      </button>
+
+      <p class="signup-link">
+        No account?
+        <a href="/signup">Sign up</a>
+      </p>
+   </form>
+
+
+  <script>
+    // Enviar datos al backend
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      // Capturar datos del formulario
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          window.location.href = '/';
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.message}`);
+        }
+      } catch (err) {
+        alert(`Error de conexión: ${err.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
