@@ -1,11 +1,27 @@
-/* From Uiverse.io by ahmed150up */ 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;  /* Centra el contenido horizontalmente */
+  align-items: center;      /* Centra el contenido verticalmente */
+  height: 100vh;            /* Asegura que la pantalla ocupe toda la altura */
+  background-color: #f4f4f4; /* Fondo suave para la página */
+}
+
+@media (max-width: 2000px) {
 .chat-card {
-    width: 300px;
+    width: 35%;
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
   }
+}
   
   .chat-header {
     padding: 10px;
@@ -21,6 +37,8 @@
   
   .chat-body {
     padding: 20px;
+    overflow-y: auto; 
+    overflow-x: hidden;
   }
   
   .message {
@@ -43,6 +61,16 @@
     color: #333;
     margin: 0;
   }
+
+  .message img {
+    max-width: 100%; /* Asegura que la imagen no exceda el ancho del contenedor */
+    max-height: 150px; /* Define la altura máxima para las imágenes */
+    width: auto; /* Mantiene la proporción del ancho */
+    height: auto; /* Mantiene la proporción de la altura */
+    border-radius: 5px; /* Opcional: redondea las esquinas de las imágenes */
+    display: block; /* Asegura que las imágenes no generen espacios adicionales */
+    margin: 5px auto; /* Centra la imagen horizontalmente */
+}
   
   .chat-footer {
     padding: 10px;

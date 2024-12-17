@@ -69,11 +69,23 @@
                     const blob = new Blob([array], { type: `image/${data.mimeType}` })
                     const blobUrl = URL.createObjectURL(blob)
                     
-                    messageContent = document.createElement("img");
-                    messageContent.src = blobUrl
+                    messageContent = document.createElement("div");
+                    const imgElement = document.createElement("img");
+                    imgElement.src = blobUrl;
+                    imgElement.setAttribute("alt", `Sent by ${data.userId}`);
+                    
+                    const senderInfo = document.createElement("p");
+                    senderInfo.textContent = `Sent by: ${data.userId}`;
+                    senderInfo.style.fontSize = "12px"; // Ajustar estilo para el texto del remitente
+                    senderInfo.style.color = "#666";
 
-                    // Añadir el nuevo mensaje al array
-                    messages_history.push({user: data.userId, type: "image", message: messageContent.src });
+                    messageContent.appendChild(imgElement);
+                    messageContent.appendChild(senderInfo);
+                    
+                    
+
+                    console.log(imgElement.src)
+                    messages_history.push({user: data.userId, type: "image", message: imgElement.src });
                 }
                 
                 console.log(messageContent)
@@ -99,8 +111,17 @@
                             messageContent.textContent = messageHist.message;
                         }
                         else if(messageHist.type == "image") {
-                            messageContent = document.createElement("img");
-                            messageContent.src = messageHist.message
+                            messageContent = document.createElement("div");
+                            const imgElement = document.createElement("img");
+                            imgElement.src = messageHist.message;
+                            imgElement.setAttribute("alt", `Sent by ${data.userId}`);
+                    
+                            const senderInfo = document.createElement("p");
+                            senderInfo.textContent = `Sent by: ${data.userId}`;
+                            senderInfo.style.fontSize = "12px";
+                            senderInfo.style.color = "#666";
+                            messageContent.appendChild(imgElement);
+                            messageContent.appendChild(senderInfo);
                         }
                         
                         newMessage.appendChild(messageContent);
