@@ -4,85 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Client</title>
+    <link rel="stylesheet" href="/CSS/chat.css">
 </head>
 <body>
-    <h1>WebSocket Client</h1>
-    <h2>Chat 1</h2>
-    <input type="text" id="messageInput" placeholder="Enter message">
-    <input type="text" id="userId" placeholder="Enter userId">
-    <input type="file" id="imageInput" placeholder="Enter image" accept="image/*">
-    
-    <button id="sendButton">Send</button>
-    <button id="disconnectButton">Disconnect</button>
-    <div id="output"></div>
-    
-    <script>
-        // Connect to the WebSocket server
-        let userId = "<%= user%>";
-        const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
-
-        ws.onopen = () => {
-            console.log("Connected to server");
-        };
-
-        ws.onmessage = (event) => {
-            const outputDiv = document.getElementById("output");
-            const newMessage = document.createElement("p");
-            newMessage.textContent = `Server: ${event.data}`;
-            outputDiv.appendChild(newMessage);
-        };
-
-        ws.onclose = () => {
-            console.log("Disconnected from server");
-        };
-
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-
-        document.getElementById("disconnectButton").addEventListener("click", () => {
-            ws.close()
-        });
-
-        document.getElementById("sendButton").addEventListener("click", () => {
-            const messageInput = document.getElementById("messageInput");
-            const message = messageInput.value;
+    <div class="chat-card">
+        <div class="chat-header">
+            <div class="h2">Chat</div>
+        </div>
+        <div id ="chat-body" class="chat-body">
+        
             
-            const imageInput = document.getElementById("imageInput");
-            const imageValues = imageInput.files;
+        </div>
+        <div class="chat-footer">
+            <input id="messageInput" placeholder="Type your message" type="text">
 
-            if (message) {
+            <button id="sendButton">Send</button>
+            
+        </div>
+        <input id="imageInput" type="file">
+    </div>
+
+    <script>
+        let messages_history = [];
+        // Esperamos a que el DOM esté completamente cargado
+        document.addEventListener("DOMContentLoaded", function() {
+            // Conectar al servidor WebSocket
+            let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
+            let chatId = "<%= chat %>";
+            const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
+
+            // Cuando la conexión esté abierta
+            ws.onopen = () => {
+                console.log("Connected to server");
+            };
+
+            // Recibir mensajes del servidor
+            ws.onmessage = (event) => {
+                // console.log('Received message:', event.data);
+                const data = JSON.parse(event.data); 
+                const outputDiv = document.getElementById("chat-body");
                 
-                const messageWebSocket = {
-                    type: "text",
-                    content: message,
-                    userId: userId
+                // Crear el mensaje a mostrar
+                const newMessage = document.createElement("div");
+                if (data.userId === userId) {
+                    newMessage.classList.add("message", "outgoing");
+                } else {
+                    newMessage.classList.add("message", "incoming");
+                }
+                
+                let messageContent;
+                if (data.type == "text") {
+                    messageContent = document.createElement("p");
+                    messageContent.textContent = `${data.userId} : ${data.message}`;
+    
+                    // Añadir el nuevo mensaje al array
+                    messages_history.push({user: data.userId, type: "text", message: messageContent.textContent});
+                }
+                else if(data.type == "image") {
+
+                    const binary = atob(data.content)
+                    const array = new Uint8Array(binary.length)
+                    for (let i = 0; i < binary.length; ++i) {
+                        array[i] = binary.charCodeAt(i)
+                    }
+                    const blob = new Blob([array], { type: `image/${data.mimeType}` })
+                    const blobUrl = URL.createObjectURL(blob)
+                    
+                    messageContent = document.createElement("img");
+                    messageContent.src = blobUrl
+
+                    // Añadir el nuevo mensaje al array
+                    messages_history.push({user: data.userId, type: "image", message: messageContent.src });
+                }
+                
+                console.log(messageContent)
+                newMessage.appendChild(messageContent);
+                outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
+
+                if (messages_history.length > 10) {
+                    messages_history.shift();
+                    outputDiv.innerHTML = ''; // Limpiar el div
+                
+                    // Añadir los últimos 10 mensajes al div
+                    messages_history.forEach(messageHist => {
+                        const newMessage = document.createElement("div");
+                        if (messageHist.user === userId) {
+                            newMessage.classList.add("message", "outgoing");
+                        } else {
+                            newMessage.classList.add("message", "incoming");
+                        }
+                        
+                        let messageContent;
+                        if (messageHist.type == "text") {
+                            messageContent = document.createElement("p");
+                            messageContent.textContent = messageHist.message;
+                        }
+                        else if(messageHist.type == "image") {
+                            messageContent = document.createElement("img");
+                            messageContent.src = messageHist.message
+                        }
+                        
+                        newMessage.appendChild(messageContent);
+                        outputDiv.appendChild(newMessage);
+                    });
                 }
 
-                ws.send(JSON.stringify(messageWebSocket)); // Send message to the server
-                messageInput.value = ""; // Clear input
+
+            };
+
+            // Cuando la conexión se cierre
+            ws.onclose = () => {
+                console.log("Disconnected from server");
+            };
+
+            // Manejar errores de WebSocket
+            ws.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+
+            let selectedFile = null
+            document.getElementById("imageInput").addEventListener("change", (event) => {
+                if (event.target.files.length > 0)
+                    selectedFile = event.target.files[0]
+                console.log(selectedFile)
+            })
+
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(",")[1])
+                    reader.onerror = reject
+                    reader.readAsDataURL(file)
+                })
             }
 
-            //console.log(imageValues.length);
-            if (imageValues > 0) {
-                const image = imageInput.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = () => {
-                    const arrayBuffer = reader.result // The binary image data
-                    const imageObject = {
-                        type: "image",
-                        content: arrayBuffer.toString('base64')
+
+            // Enviar mensajes
+            document.getElementById("sendButton").addEventListener("click", async () => {
+                console.log('Sending message...');
+                const messageInput = document.getElementById("messageInput");
+                const message = messageInput.value;
+                console.log('Message:', message);
+
+                if (message) {
+                    const messageWebSocket = {
+                        type: "text",
+                        content: message,
+                        userId: userId
+                    };
+                    ws.send(JSON.stringify(messageWebSocket)); // Enviar mensaje al servidor
+                    messageInput.value = ""; // Limpiar el campo de mensaje
+                }
+                else if(selectedFile) {
+                    try {
+                        const mimeType = selectedFile.name.split('.')[1]
+                        const imageBase64 = await fileToBase64(selectedFile)
+
+                        const messageWebSocket = {
+                            type: "image",
+                            content: imageBase64,
+                            userId: userId,
+                            mimeType: mimeType
+                        }
+
+
+                        ws.send(JSON.stringify(messageWebSocket))
+                    } catch (error) {
+                        console.log("Error reading the file:", error)
+                    }
+                }
+
+                /*
+                if (imageValues.length > 0) {
+                    const image = imageValues[0];
+                    const reader = new FileReader();
+
+                    reader.onload = () => {
+                        const arrayBuffer = reader.result; // Los datos binarios de la imagen
+                        const imageObject = {
+                            type: "image",
+                            content: arrayBuffer.toString('base64') // Convertir la imagen a base64
+                        };
+
+                        // Enviar los datos de la imagen
+                        console.log('Sending image data inside an object...');
+                        ws.send(JSON.stringify(imageObject));  // Enviar la imagen en formato JSON
                     };
 
-                    // Convert the object to a JSON string and send it over WebSocket
-                    console.log('Sending image data inside an object...');
-                    ws.send(JSON.stringify(imageObject));  // Send the JSON string
-                };
-
-                // Read the image as ArrayBuffer
-                reader.readAsArrayBuffer(image);             
-            }
+                    // Leer la imagen como ArrayBuffer
+                    reader.readAsArrayBuffer(image);
+                }
+                */
+            });
         });
     </script>
 </body>
