@@ -92,7 +92,7 @@
                 newMessage.appendChild(messageContent);
                 outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
 
-                if (messages_history.length > 10) {
+                if (messages_history.length > 100) {
                     messages_history.shift();
                     outputDiv.innerHTML = ''; // Limpiar el div
                 
