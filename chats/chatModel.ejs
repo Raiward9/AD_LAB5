@@ -164,7 +164,8 @@
                 console.log('Sending message...');
                 const messageInput = document.getElementById("messageInput");
                 const message = messageInput.value;
-                console.log('Message:', message);
+                
+                const fileInput = document.getElementById("imageInput");
 
                 if (message) {
                     const messageWebSocket = {
@@ -189,32 +190,11 @@
 
 
                         ws.send(JSON.stringify(messageWebSocket))
+                        fileInput.value = "";
                     } catch (error) {
                         console.log("Error reading the file:", error)
                     }
                 }
-
-                /*
-                if (imageValues.length > 0) {
-                    const image = imageValues[0];
-                    const reader = new FileReader();
-
-                    reader.onload = () => {
-                        const arrayBuffer = reader.result; // Los datos binarios de la imagen
-                        const imageObject = {
-                            type: "image",
-                            content: arrayBuffer.toString('base64') // Convertir la imagen a base64
-                        };
-
-                        // Enviar los datos de la imagen
-                        console.log('Sending image data inside an object...');
-                        ws.send(JSON.stringify(imageObject));  // Enviar la imagen en formato JSON
-                    };
-
-                    // Leer la imagen como ArrayBuffer
-                    reader.readAsArrayBuffer(image);
-                }
-                */
             });
         });
     </script>

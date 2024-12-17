@@ -10,12 +10,8 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-import chatRouter from './routes/chat.route.js';
-
 import authRouter from './routes/auth.route.js';
 import cookieParser from 'cookie-parser'
-
-import fs from 'fs'
 
 import { 
         initSocketConnection, 
@@ -36,12 +32,13 @@ server.on('connection', (socket, req) => {
 
     console.log(`Client connected, User: ${userId}, Chat: ${chat}`);
 
-    socket.on('message', (message) => {
+    socket.on('message', async (message) => {
         const messageSent = JSON.parse(message)
 
         console.log(messageSent)
         let response = prepareResponseMessage(messageSent)
         broadcastMessageInSocketChat(response, chat)
+        // await storeMessageInDatabase(response)
         
     });
 
@@ -90,18 +87,14 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
     const { user } = req.session
     if (!user) {
-        //console.log(req.session.user)
         return res.redirect('/signin')
     }
 
-    //const filePath = path.join(process.cwd(), 'chats', 'chat1.html');
-    //res.sendFile(filePath);
     res.render('chatModel', { user: user.username });
 })
 
 app.get('/signin', (req, res) => {
     const filePath = path.join(process.cwd(), 'frontend', 'login.html');
-    //const CSSpath = path.join(process.cwd(), 'CSS', 'login.css');
     res.sendFile(filePath);
 })
 
@@ -110,21 +103,7 @@ app.get('/signup', (req, res) => {
     res.sendFile(filePath);
 })
 
-
-// app.get('/chat/2/id', (req, res) => {
-//     const filePath = path.join(process.cwd(), 'chats', 'chat2.html');
-//     res.sendFile(filePath);
-// })
-
-
 app.use('/auth', authRouter);
-
-app.use('/chats', chatRouter);
-
-app.get('/chats/id', (req, res) => {
-    const filePath = path.join(process.cwd(), 'chats', `chat${id}.html`);
-    res.sendFile(filePath);
-})
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
