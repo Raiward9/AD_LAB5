@@ -57,23 +57,15 @@
                 dbMessages.forEach(message => {
                     //console.log(message);
                     const outputDiv = document.getElementById("chat-body");
-                    messages_history.push({user: message.username, type: message.type, message: message.message});
-                    console.log(messages_history);
-                    const newMessage = document.createElement("div");
-                    if (message.username === userId) {
-                        newMessage.classList.add("message", "outgoing");
-                    } else {
-                        newMessage.classList.add("message", "incoming");
-                    }
+                    const newMessage = createMessage(message.username, userId)
                     
                     let messageContent;
-                    if (message.type == "text") {
-                        messageContent = document.createElement("p");
-                        messageContent.textContent = `${message.username} : ${message.message}`;
-                    }
+                    messageContent = createTextMessageContent(messageContent, message.username, message.message, message.type, messages_history)
                     
                     newMessage.appendChild(messageContent);
                     outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
+
+                    scrollToBottom()
                 });
             })();
 
@@ -82,6 +74,14 @@
                 console.log("Connected to server");
             };
 
+            function createImageElement(src, userId) {
+                const imgElement = document.createElement("img");
+                imgElement.src = src;
+                imgElement.setAttribute("alt", `Sent by ${userId}`);
+
+                return imgElement
+            }
+
             // Recibir mensajes del servidor
             ws.onmessage = async (event) => {
                 // console.log('Received message:', event.data);
@@ -89,27 +89,23 @@
                 const outputDiv = document.getElementById("chat-body");
                 
                 // Crear el mensaje a mostrar
-                const newMessage = createMessage(data, userId)
+                const newMessage = createMessage(data.userId, userId)
                 
                 let messageContent;
                 if (data.type == "text") {
-                    messageContent = createTextMessageContent(messageContent, data, messages_history)
+                    messageContent = createTextMessageContent(messageContent, data.userId, data.message, "text", messages_history)
                 }
                 else if(data.type == "image") {
 
                     const blobUrl = generateBlobUrl(data)
                     
                     messageContent = document.createElement("div");
-                    const imgElement = document.createElement("img");
-                    imgElement.src = blobUrl;
-                    imgElement.setAttribute("alt", `Sent by ${data.userId}`);
-                    
+                    const imgElement = createImageElement(blobUrl, data.userId)
                     const senderInfo = createSenderInfo(data)
 
                     messageContent.appendChild(imgElement);
                     messageContent.appendChild(senderInfo);
 
-                    console.log(imgElement.src)
                     messages_history.push({user: data.userId, type: "image", message: imgElement.src });
                 }
                 
@@ -123,7 +119,7 @@
                 
                     // Añadir los últimos 10 mensajes al div
                     messages_history.forEach(messageHist => {
-                        const newMessage = createMessage(data, userId)
+                        const newMessage = createMessage(data.userId, userId)
                         
                         let messageContent;
                         if (messageHist.type == "text") {
@@ -132,10 +128,8 @@
                         }
                         else if(messageHist.type == "image") {
                             messageContent = document.createElement("div");
-                            const imgElement = document.createElement("img");
-                            imgElement.src = messageHist.message;
-                            imgElement.setAttribute("alt", `Sent by ${data.userId}`);
-                    
+
+                            const imgElement = createImageElement(messageHist.message, data.userId)
                             const senderInfo = createSenderInfo(data)
 
                             messageContent.appendChild(imgElement);
@@ -160,9 +154,9 @@
                 console.error("WebSocket error:", error);
             };
 
-            function createMessage (data, userId) {
+            function createMessage (dataUserId, userId) {
                 const newMessage = document.createElement("div");
-                if (data.userId === userId) {
+                if (dataUserId === userId) {
                     newMessage.classList.add("message", "outgoing");
                 } else {
                     newMessage.classList.add("message", "incoming");
@@ -171,12 +165,12 @@
                 return newMessage
             }
 
-            function createTextMessageContent (messageContent, data, messages_history) {
+            function createTextMessageContent (messageContent, dataUserId, dataMessage, dataType, messages_history) {
                 messageContent = document.createElement("p");
-                messageContent.textContent = `${data.userId} : ${data.message}`;
+                messageContent.textContent = `${dataUserId} : ${dataMessage}`;
 
                 // Añadir el nuevo mensaje al array
-                messages_history.push({user: data.userId, type: "text", message: messageContent.textContent});
+                messages_history.push({user: dataUserId, type: dataType, message: messageContent.textContent});
 
                 return messageContent
             }
