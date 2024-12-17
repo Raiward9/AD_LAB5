@@ -13,7 +13,7 @@ export const getMessages = async (req, res, next) => {
     console.log(`Num messages: ${numMessages}`)
 
     try {
-        const messages = await Chat.find({chatId}).sort({CreationDate: -1}).limit(numMessages);
+        const messages = await Chat.find({chatId}).sort({CreationDate: 1}).limit(numMessages);
         console.log(messages)
         if (!messages) {
             return res.status(statusCodes.NO_CONTENT).json(messages);

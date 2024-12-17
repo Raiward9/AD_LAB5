@@ -32,6 +32,51 @@
             let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
             const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
 
+            async function fetchMessages() {
+                try {
+                    const response = await fetch('/chat/1/messages/100', {
+                        method: 'GET',
+                    });
+                    
+                    // Verifica si la respuesta fue exitosa (código de estado 200)
+                    if (response.ok) {
+                        const data = await response.json();  // Convierte la respuesta a JSON
+                        //console.log("Messages retrieved:", data);  // Muestra los mensajes obtenidos
+                        return data;  // Devuelve los datos
+                    } else {
+                        console.error("Failed to fetch messages. Status:", response.status);
+                    }
+                } catch (error) {
+                    console.error("Error retrieving messages:", error);
+                }
+            }
+
+
+            (async function() {
+                dbMessages = await fetchMessages();
+                dbMessages.forEach(message => {
+                    //console.log(message);
+                    const outputDiv = document.getElementById("chat-body");
+                    messages_history.push({user: message.username, type: message.type, message: message.message});
+                    console.log(messages_history);
+                    const newMessage = document.createElement("div");
+                    if (message.username === userId) {
+                        newMessage.classList.add("message", "outgoing");
+                    } else {
+                        newMessage.classList.add("message", "incoming");
+                    }
+                    
+                    let messageContent;
+                    if (message.type == "text") {
+                        messageContent = document.createElement("p");
+                        messageContent.textContent = `${message.username} : ${message.message}`;
+                    }
+                    
+                    newMessage.appendChild(messageContent);
+                    outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
+                });
+            })();
+
             // Cuando la conexión esté abierta
             ws.onopen = () => {
                 console.log("Connected to server");
