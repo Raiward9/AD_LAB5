@@ -44,45 +44,25 @@
                 const outputDiv = document.getElementById("chat-body");
                 
                 // Crear el mensaje a mostrar
-                const newMessage = document.createElement("div");
-                if (data.userId === userId) {
-                    newMessage.classList.add("message", "outgoing");
-                } else {
-                    newMessage.classList.add("message", "incoming");
-                }
+                const newMessage = createMessage(data, userId)
                 
                 let messageContent;
                 if (data.type == "text") {
-                    messageContent = document.createElement("p");
-                    messageContent.textContent = `${data.userId} : ${data.message}`;
-    
-                    // Añadir el nuevo mensaje al array
-                    messages_history.push({user: data.userId, type: "text", message: messageContent.textContent});
+                    messageContent = createTextMessageContent(messageContent, data, messages_history)
                 }
                 else if(data.type == "image") {
 
-                    const binary = atob(data.content)
-                    const array = new Uint8Array(binary.length)
-                    for (let i = 0; i < binary.length; ++i) {
-                        array[i] = binary.charCodeAt(i)
-                    }
-                    const blob = new Blob([array], { type: `image/${data.mimeType}` })
-                    const blobUrl = URL.createObjectURL(blob)
+                    const blobUrl = generateBlobUrl(data)
                     
                     messageContent = document.createElement("div");
                     const imgElement = document.createElement("img");
                     imgElement.src = blobUrl;
                     imgElement.setAttribute("alt", `Sent by ${data.userId}`);
                     
-                    const senderInfo = document.createElement("p");
-                    senderInfo.textContent = `Sent by: ${data.userId}`;
-                    senderInfo.style.fontSize = "12px"; // Ajustar estilo para el texto del remitente
-                    senderInfo.style.color = "#666";
+                    const senderInfo = createSenderInfo(data)
 
                     messageContent.appendChild(imgElement);
                     messageContent.appendChild(senderInfo);
-                    
-                    
 
                     console.log(imgElement.src)
                     messages_history.push({user: data.userId, type: "image", message: imgElement.src });
@@ -98,12 +78,7 @@
                 
                     // Añadir los últimos 10 mensajes al div
                     messages_history.forEach(messageHist => {
-                        const newMessage = document.createElement("div");
-                        if (messageHist.user === userId) {
-                            newMessage.classList.add("message", "outgoing");
-                        } else {
-                            newMessage.classList.add("message", "incoming");
-                        }
+                        const newMessage = createMessage(data, userId)
                         
                         let messageContent;
                         if (messageHist.type == "text") {
@@ -116,10 +91,8 @@
                             imgElement.src = messageHist.message;
                             imgElement.setAttribute("alt", `Sent by ${data.userId}`);
                     
-                            const senderInfo = document.createElement("p");
-                            senderInfo.textContent = `Sent by: ${data.userId}`;
-                            senderInfo.style.fontSize = "12px";
-                            senderInfo.style.color = "#666";
+                            const senderInfo = createSenderInfo(data)
+
                             messageContent.appendChild(imgElement);
                             messageContent.appendChild(senderInfo);
                         }
@@ -141,6 +114,49 @@
             ws.onerror = (error) => {
                 console.error("WebSocket error:", error);
             };
+
+            function createMessage (data, userId) {
+                const newMessage = document.createElement("div");
+                if (data.userId === userId) {
+                    newMessage.classList.add("message", "outgoing");
+                } else {
+                    newMessage.classList.add("message", "incoming");
+                }
+
+                return newMessage
+            }
+
+            function createTextMessageContent (messageContent, data, messages_history) {
+                messageContent = document.createElement("p");
+                messageContent.textContent = `${data.userId} : ${data.message}`;
+
+                // Añadir el nuevo mensaje al array
+                messages_history.push({user: data.userId, type: "text", message: messageContent.textContent});
+
+                return messageContent
+            }
+
+            function generateBlobUrl(data) {
+                const binary = atob(data.content)
+                const array = new Uint8Array(binary.length)
+                for (let i = 0; i < binary.length; ++i) {
+                    array[i] = binary.charCodeAt(i)
+                }
+                const blob = new Blob([array], { type: `image/${data.mimeType}` })
+                const blobUrl = URL.createObjectURL(blob)
+
+                return blobUrl
+            }
+
+            function createSenderInfo(data) {
+                // const senderInfo = createSenderInfo(data.userId)
+                const senderInfo = document.createElement("p");
+                senderInfo.textContent = `Sent by: ${data.userId}`;
+                senderInfo.style.fontSize = "12px"; // Ajustar estilo para el texto del remitente
+                senderInfo.style.color = "#666";
+
+                return senderInfo
+            }
 
             function scrollToBottom() {
                 const chatContainer = document.getElementById('chat-body')
