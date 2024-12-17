@@ -38,7 +38,7 @@
             };
 
             // Recibir mensajes del servidor
-            ws.onmessage = (event) => {
+            ws.onmessage = async (event) => {
                 // console.log('Received message:', event.data);
                 const data = JSON.parse(event.data); 
                 const outputDiv = document.getElementById("chat-body");
@@ -129,7 +129,7 @@
                     });
                 }
 
-
+                scrollToBottom()
             };
 
             // Cuando la conexión se cierre
@@ -141,6 +141,11 @@
             ws.onerror = (error) => {
                 console.error("WebSocket error:", error);
             };
+
+            function scrollToBottom() {
+                const chatContainer = document.getElementById('chat-body')
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
 
             let selectedFile = null
             document.getElementById("imageInput").addEventListener("change", (event) => {
