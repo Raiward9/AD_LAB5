@@ -74,14 +74,6 @@
                 console.log("Connected to server");
             };
 
-            function createImageElement(src, userId) {
-                const imgElement = document.createElement("img");
-                imgElement.src = src;
-                imgElement.setAttribute("alt", `Sent by ${userId}`);
-
-                return imgElement
-            }
-
             // Recibir mensajes del servidor
             ws.onmessage = async (event) => {
                 // console.log('Received message:', event.data);
@@ -195,6 +187,14 @@
                 senderInfo.style.color = "#666";
 
                 return senderInfo
+            }
+
+            function createImageElement(src, userId) {
+                const imgElement = document.createElement("img");
+                imgElement.src = src;
+                imgElement.setAttribute("alt", `Sent by ${userId}`);
+
+                return imgElement
             }
 
             function scrollToBottom() {
