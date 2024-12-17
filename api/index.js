@@ -22,6 +22,8 @@ import {
     } from './sockets/socketManager.js';
 import { obtainQueryParamFromUrl, prepareResponseMessage } from './utils/sockets.js';
 
+import { storeMessageInDatabase } from './controllers/chat.controller.js';
+
 
 const PORT_WS = process.env.PORT_WS || 8765
 const server = new WebSocketServer({ port: PORT_WS });
@@ -40,7 +42,8 @@ server.on('connection', (socket, req) => {
         console.log(messageSent)
         let response = prepareResponseMessage(messageSent)
         broadcastMessageInSocketChat(response, chat)
-        // await storeMessageInDatabase(response)
+        response.chatId = "1"
+        await storeMessageInDatabase(response)
         
     });
 
