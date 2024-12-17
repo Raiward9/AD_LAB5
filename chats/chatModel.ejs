@@ -60,7 +60,10 @@
                     const newMessage = createMessage(message.username, userId)
                     
                     let messageContent;
-                    messageContent = createTextMessageContent(messageContent, message.username, message.message, message.type, messages_history)
+                    if (message.type == "text") {
+                        messageContent = createTextMessageContent(messageContent, message.username, message.message, message.type, messages_history)
+                    }
+                    
                     
                     newMessage.appendChild(messageContent);
                     outputDiv.appendChild(newMessage); // Añadir el mensaje al div correspondiente
