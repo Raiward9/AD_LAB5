@@ -11,6 +11,8 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 import authRouter from './routes/auth.route.js';
+import chatRouter from './routes/chat.route.js';
+
 import cookieParser from 'cookie-parser'
 
 import { 
@@ -21,8 +23,8 @@ import {
 import { obtainQueryParamFromUrl, prepareResponseMessage } from './utils/sockets.js';
 
 
-
-const server = new WebSocketServer({ port: 8765 });
+const PORT_WS = process.env.PORT_WS || 8765
+const server = new WebSocketServer({ port: PORT_WS });
 
 server.on('connection', (socket, req) => {
     const uniqueSocketIdentifier = initSocketConnection(socket, req)
@@ -105,7 +107,9 @@ app.get('/signup', (req, res) => {
 
 app.use('/auth', authRouter);
 
-const PORT = process.env.PORT || 3000
+app.use('/chat', chatRouter);
+
+const PORT = process.env.PORT_API || 3000
 app.listen(PORT, () => {
     console.log(`Server is running on: http://localhost:${PORT}`)
 })
