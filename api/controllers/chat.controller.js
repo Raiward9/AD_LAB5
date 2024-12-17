@@ -29,6 +29,9 @@ export const getMessages = async (req, res, next) => {
 
 export const storeMessageInDatabase = async (message) => {
     const {chatId, userId, message: messageText, type} = message;
+
+    if (type != "text") return;
+    
     //console.log('Message:', message);
     const newMessage = new Chat({chatId, username:userId, message: messageText, type});
 
