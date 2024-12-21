@@ -81,3 +81,16 @@ export const newChat = async (req, res, next) => {
         next(errorHandler(res, error));
     }
 }
+
+export const newUserInChat = async (req, res, next) => {
+    const {username, chatId} = req.body;
+    console.log('New user:', username, 'in chat:', chatId);
+    const newUser = new ChatUser({chatId, username});
+
+    try {
+        await newUser.save();
+        res.status(statusCodes.CREATED).json({message: 'New user added to chat', newUser: newUser});
+    } catch (error) {
+        next(errorHandler(res, error));
+    }
+}

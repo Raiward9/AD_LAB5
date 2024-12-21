@@ -48,9 +48,8 @@ body {
 
 
 
-@media (max-width: 2000px) {
+@media (max-width: 4000px) {
 .chat-card {
-    width: 35%;
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -164,4 +163,42 @@ body {
   .chat-card .message:nth-child(odd) {
     animation-delay: 0s;
   }
-  
+
+  .main-container {
+    display: flex;
+    flex-direction: column; /* Asegura que los elementos estén en una columna */
+    gap: 20px; /* Espacio entre el formulario y el chat */
+    padding: 20px; /* Margen interior para un diseño limpio */
+    width: 35%; /* Ocupa el 90% del ancho de la pantalla */
+    max-width: 1200px; /* Define un ancho máximo más grande */
+    margin: 0 auto; /* Centra el contenedor en la página */
+}
+
+
+.invite-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Espacio entre elementos */
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+
+
+.invite-container button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #4285f4;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.invite-container button:hover {
+  background-color: #0f9d58;
+}  

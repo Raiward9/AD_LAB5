@@ -13,22 +13,27 @@
             <a id="signout" href="/auth/signout">Signout</a>
         </nav>
     </header>
-    <div class="chat-card">
-        <div class="chat-header">
-            <div class="h2">Chat</div>
+    <div class="main-container">
+        <div class="invite-container">
+            <form id="invite-form">
+                <label for="invite">Invite a user:</label>
+                <input type="text" id="invite" name="invite" required>
+                <button type="submit">Invite</button>
+            </form>
         </div>
-        <div id ="chat-body" class="chat-body">
-        
-            
+        <div class="chat-card">
+            <div class="chat-header">
+                <div class="h2">Chat</div>
+            </div>
+            <div id="chat-body" class="chat-body"></div>
+            <div class="chat-footer">
+                <input id="messageInput" placeholder="Type your message" type="text">
+                <button id="sendButton">Send</button>
+            </div>
+            <input id="imageInput" type="file">
         </div>
-        <div class="chat-footer">
-            <input id="messageInput" placeholder="Type your message" type="text">
-
-            <button id="sendButton">Send</button>
-            
-        </div>
-        <input id="imageInput" type="file">
     </div>
+    
 
     <script>
         let messages_history = [];
