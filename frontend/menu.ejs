@@ -62,7 +62,14 @@
             });
             const data = await response.json();
             if (response.ok) {
-                console.log(data);
+                console.log(data)
+                fetch(`/user/${userId}/chat/${data.newChat.chatId}`, {
+                        method: 'GET',
+                    })
+                    .then(response => {
+                        if(response.ok)
+                            window.location.href = response.url
+                    })
             }
         });
 

@@ -1,5 +1,5 @@
-import ChatMessage from '../models/chatMessage.model.js';
 import ChatUser from '../models/chatUser.model.js';
+import User from '../models/user.model.js';
 
 import {errorHandler} from '../utils/error.js';
 
@@ -26,6 +26,11 @@ export const getChat = async (req, res) => {
     const chatUser = await ChatUser.findOne({username, chatId});
     if (chatUser == null) {
         return res.status(statusCodes.BAD_REQUEST).json({ message: "Chat not accessible" });
+    }
+
+    const user = await User.findOne({username});
+    if (user == null) {
+        return res.status(statusCodes.BAD_REQUEST).json({ message: "User doesn't exist" });
     }
 
     res.render('chatModel', { user: username, chatId: chatId });

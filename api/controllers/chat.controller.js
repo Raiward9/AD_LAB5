@@ -1,5 +1,6 @@
 import ChatMessage from '../models/chatMessage.model.js';
 import ChatUser from '../models/chatUser.model.js';
+import User from '../models/user.model.js';
 
 import {errorHandler} from '../utils/error.js';
 
@@ -29,15 +30,18 @@ export const getMessages = async (req, res, next) => {
 }
 
 export const storeMessageInDatabase = async (message) => {
-    const {chatId, userId, message: messageText, type} = message;
-
-    if (type != "text") return;
+    let newMessage = null;
+    const typeMessage = message.type;
+    if (typeMessage == "text") {
+        const {chatId, userId, message: messageText, type} = message;
+        newMessage = new ChatMessage({chatId, username:userId, message: messageText, type});
+    } 
+    else {
+        const {chatId, userId, content, type} = message;
+        newMessage = new ChatMessage({chatId, username:userId, message: content, mimeType: message.mimeType, type});
+    }
     
-    //console.log('Message:', message);
-    const newMessage = new ChatMessage({chatId, username:userId, message: messageText, type});
-
     try {
-        //console.log('Message to store:', newMessage);
         await newMessage.save();
     } catch (error) {
         console.error('Error storing message:', error);
@@ -85,6 +89,16 @@ export const newChat = async (req, res, next) => {
 export const newUserInChat = async (req, res, next) => {
     const {chatId, username} = req.params;
     console.log('New user:', username, 'in chat:', chatId);
+
+    const chatUser = await ChatUser.findOne({chatId, username})
+    if (chatUser != null)
+        return res.status(statusCodes.BAD_REQUEST).json({ message: "User is already in the chat." })
+
+    const user = await User.findOne({username});
+    if (user == null) {
+        return res.status(statusCodes.BAD_REQUEST).json({ message: "User doesn't exist" });
+    }
+
     const newUser = new ChatUser({chatId, username});
 
     try {

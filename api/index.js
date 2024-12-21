@@ -46,7 +46,6 @@ server.on('connection', (socket, req) => {
         broadcastMessageInSocketChat(response, chat)
         response.chatId = chat
         await storeMessageInDatabase(response)
-        
     });
 
     socket.on('close', () => {

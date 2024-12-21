@@ -17,8 +17,8 @@
         <div class="invite-container">
             <form id="invite-form">
                 <label for="invite">Invite a user:</label>
-                <input type="text" id="invite" name="invite" required>
-                <button type="submit">Invite</button>
+                <input type="text" id="inviteInput" name="invite" required>
+                <button type="submit" id="inviteSubmitBtn">Invite</button>
             </form>
         </div>
         <div class="chat-card">
@@ -76,6 +76,18 @@
                     if (message.type == "text") {
                         messageContent = createTextMessageContent(messageContent, message.username, message.message, message.type, messages_history)
                     }
+                    else {
+                        const blobUrl = generateBlobUrl(message.message, message.mimeType)
+                    
+                        messageContent = document.createElement("div");
+                        const imgElement = createImageElement(blobUrl, message.username)
+                        const senderInfo = createSenderInfo(message.username)
+
+                        messageContent.appendChild(imgElement);
+                        messageContent.appendChild(senderInfo);
+
+                        messages_history.push({user: message.username, type: "image", message: imgElement.src });
+                    }
                     
                     
                     newMessage.appendChild(messageContent);
@@ -105,11 +117,11 @@
                 }
                 else if(data.type == "image") {
 
-                    const blobUrl = generateBlobUrl(data)
+                    const blobUrl = generateBlobUrl(data.content, data.mimeType)
                     
                     messageContent = document.createElement("div");
                     const imgElement = createImageElement(blobUrl, data.userId)
-                    const senderInfo = createSenderInfo(data)
+                    const senderInfo = createSenderInfo(data.userId)
 
                     messageContent.appendChild(imgElement);
                     messageContent.appendChild(senderInfo);
@@ -138,7 +150,7 @@
                             messageContent = document.createElement("div");
 
                             const imgElement = createImageElement(messageHist.message, data.userId)
-                            const senderInfo = createSenderInfo(data)
+                            const senderInfo = createSenderInfo(data.userId)
 
                             messageContent.appendChild(imgElement);
                             messageContent.appendChild(senderInfo);
@@ -183,22 +195,22 @@
                 return messageContent
             }
 
-            function generateBlobUrl(data) {
-                const binary = atob(data.content)
+            function generateBlobUrl(content, mimeType) {
+                const binary = atob(content)
                 const array = new Uint8Array(binary.length)
                 for (let i = 0; i < binary.length; ++i) {
                     array[i] = binary.charCodeAt(i)
                 }
-                const blob = new Blob([array], { type: `image/${data.mimeType}` })
+                const blob = new Blob([array], { type: `image/${mimeType}` })
                 const blobUrl = URL.createObjectURL(blob)
 
                 return blobUrl
             }
 
-            function createSenderInfo(data) {
+            function createSenderInfo(userId) {
                 // const senderInfo = createSenderInfo(data.userId)
                 const senderInfo = document.createElement("p");
-                senderInfo.textContent = `Sent by: ${data.userId}`;
+                senderInfo.textContent = `Sent by: ${userId}`;
                 senderInfo.style.fontSize = "12px"; // Ajustar estilo para el texto del remitente
                 senderInfo.style.color = "#666";
 
@@ -289,6 +301,23 @@
                     }
                 }
             });
+
+            document.getElementById("inviteSubmitBtn").addEventListener("click", async () => {
+                const inviteInput = document.getElementById("inviteInput");
+                if (inviteInput.value != "") {
+                    fetch(`/chat/${chatId}/newUser/${inviteInput.value}`, { method: "POST" })
+                    .then(async (response) => {
+                        if (response.ok) {
+                            alert(`User invited successfully`);
+                        }
+                        else {
+                            const error = await response.json();
+                            alert(`Error: ${error.message}`);
+                        }
+                        inviteInput.value = "" 
+                    })
+                }
+            })
         });
     </script>
 </body>
