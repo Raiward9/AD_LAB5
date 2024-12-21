@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const chatSchema = new mongoose.Schema({
+const chatMessageSchema = new mongoose.Schema({
     chatId: {
         type: String,
         required: true
@@ -28,6 +28,6 @@ const chatSchema = new mongoose.Schema({
 });
 
 // Crear el modelo de Mongoose
-const Chat = mongoose.model('Chat', chatSchema);
+const ChatMessage = mongoose.model('ChatMessage', chatMessageSchema);
 
-export default Chat;
+export default ChatMessage;

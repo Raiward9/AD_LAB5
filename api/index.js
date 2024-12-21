@@ -69,7 +69,7 @@ app.use(morgan('dev'));
 app.use(cookieParser())
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(process.cwd(), 'chats'));
+app.set('views', path.join(process.cwd(), 'frontend'));
 
 app.use('/CSS', express.static(path.join(process.cwd(), 'CSS')));
 
@@ -106,6 +106,14 @@ app.get('/signin', (req, res) => {
 app.get('/signup', (req, res) => {
     const filePath = path.join(process.cwd(), 'frontend', 'register.html');
     res.sendFile(filePath);
+})
+
+app.get('/menu', (req, res) => {
+    const { user } = req.session
+    if (!user) {
+        return res.redirect('/signin')
+    }
+    res.render('menu', {user: user.username});
 })
 
 app.use('/auth', authRouter);

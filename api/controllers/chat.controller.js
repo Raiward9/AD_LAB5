@@ -1,4 +1,4 @@
-import Chat from '../models/chat.model.js';
+import ChatMessage from '../models/chatMessage.model.js';
 
 import {errorHandler} from '../utils/error.js';
 
@@ -13,7 +13,7 @@ export const getMessages = async (req, res, next) => {
     console.log(`Num messages: ${numMessages}`)
 
     try {
-        const messages = await Chat.find({chatId}).sort({CreationDate: 1}).limit(numMessages);
+        const messages = await ChatMessage.find({chatId}).sort({CreationDate: 1}).limit(numMessages);
         console.log(messages)
         if (!messages) {
             return res.status(statusCodes.NO_CONTENT).json(messages);
@@ -33,7 +33,7 @@ export const storeMessageInDatabase = async (message) => {
     if (type != "text") return;
     
     //console.log('Message:', message);
-    const newMessage = new Chat({chatId, username:userId, message: messageText, type});
+    const newMessage = new ChatMessage({chatId, username:userId, message: messageText, type});
 
     try {
         //console.log('Message to store:', newMessage);
