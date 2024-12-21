@@ -76,6 +76,25 @@
                 chatGrid.appendChild(chatCard);
             });
         };
+
+
+        document.getElementById("signout").addEventListener("click", async (event) => {
+            event.preventDefault();
+            try {
+                const response = await fetch('/auth/signout', {
+                    method: 'GET',
+                });
+
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.message}`);
+                }
+            } catch (err) {
+                alert(`Error de conexión: ${err.message}`);
+            }
+        });
     });
 </script>
 </html>
