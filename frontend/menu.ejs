@@ -74,6 +74,16 @@
                 chatCard.classList.add('card');
                 chatCard.textContent = "Chat with ID = " + chat.chatId;
                 chatGrid.appendChild(chatCard);
+
+                chatCard.addEventListener('click', () => {
+                    fetch(`/user/${userId}/chat/${chat.chatId}`, {
+                        method: 'GET',
+                    })
+                    .then(response => {
+                        if(response.ok)
+                            window.location.href = response.url
+                    })
+                })
             });
         };
 

@@ -19,3 +19,14 @@ export const getChats = async (req, res, next) => {
         next(errorHandler(res, error));
     }
 }
+
+export const getChat = async (req, res) => {
+    const {username, chatId} = req.params
+
+    const chatUser = await ChatUser.findOne({username, chatId});
+    if (chatUser == null) {
+        return res.status(statusCodes.BAD_REQUEST).json({ message: "Chat not accessible" });
+    }
+
+    res.render('chatModel', { user: username, chatId: chatId });
+}

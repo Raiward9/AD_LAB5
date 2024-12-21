@@ -83,7 +83,7 @@ export const newChat = async (req, res, next) => {
 }
 
 export const newUserInChat = async (req, res, next) => {
-    const {username, chatId} = req.body;
+    const {chatId, username} = req.params;
     console.log('New user:', username, 'in chat:', chatId);
     const newUser = new ChatUser({chatId, username});
 

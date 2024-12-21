@@ -44,7 +44,7 @@ server.on('connection', (socket, req) => {
         console.log(messageSent)
         let response = prepareResponseMessage(messageSent)
         broadcastMessageInSocketChat(response, chat)
-        response.chatId = "1"
+        response.chatId = chat
         await storeMessageInDatabase(response)
         
     });
@@ -96,8 +96,7 @@ app.get('/', (req, res) => {
     if (!user) {
         return res.redirect('/signin')
     }
-
-    res.render('chatModel', { user: user.username });
+    res.render('menu', {user: user.username});
 })
 
 app.get('/signin', (req, res) => {

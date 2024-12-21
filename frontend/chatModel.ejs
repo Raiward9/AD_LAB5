@@ -40,12 +40,14 @@
         // Esperamos a que el DOM esté completamente cargado
         document.addEventListener("DOMContentLoaded", function() {
             // Conectar al servidor WebSocket
-            let userId = "<%= user %>"; // Esto debería reemplazarse por el valor real del servidor
-            const ws = new WebSocket(`ws://localhost:8765?chat=1&userId=${userId}`);
+            let userId = "<%= user %>";
+            let chatId = "<%= chatId %>";
+
+            const ws = new WebSocket(`ws://localhost:8765?chat=${chatId}&userId=${userId}`);
 
             async function fetchMessages() {
                 try {
-                    const response = await fetch('/chat/1/messages/100', {
+                    const response = await fetch(`/chat/${chatId}/messages/100`, {
                         method: 'GET',
                     });
                     
