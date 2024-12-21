@@ -12,6 +12,8 @@ dotenv.config();
 
 import authRouter from './routes/auth.route.js';
 import chatRouter from './routes/chat.route.js';
+import userRouter from './routes/user.route.js';
+
 
 import cookieParser from 'cookie-parser'
 
@@ -119,6 +121,7 @@ app.get('/menu', (req, res) => {
 app.use('/auth', authRouter);
 
 app.use('/chat', chatRouter);
+app.use('/user', userRouter);
 
 const PORT = process.env.PORT_API || 3000
 app.listen(PORT, () => {

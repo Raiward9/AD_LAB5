@@ -19,48 +19,63 @@
             <h2>My chats:</h2>
             <button id="create-chat">Create chat</button>
         </div>
-        <div class="grid-container">
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
-            <div class="card"> Click me </div>
+        <div id ="chat-grid" class="grid-container">
+            
         </div>
     </main>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let userId = "<%= user %>";
+        async function fetchChats() {
+            try {
+                const response = await fetch(`/user/${userId}/getChats`, {
+                method: 'GET',
+                });
+                if (response.ok) {
+                    const chats = await response.json();
+                    return chats;
+                } else {
+                        console.error("Failed to fetch chats. Status:", response.status);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        (async () => {
+            const chats = await fetchChats();
+            const chatGrid = document.getElementById('chat-grid');
+            addChatCards(chats);
+        })();
+
+
+        const createChat = document.getElementById('create-chat');
+        createChat.addEventListener('click', async () => {
+            const response = await fetch('/chat/newChat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: userId})
+            });
+            const data = await response.json();
+            if (response.ok) {
+                console.log(data);
+            }
+        });
+
+
+        const addChatCards = (chats) => {
+            const chatGrid = document.getElementById('chat-grid');
+            chats.forEach(chat => {
+                const chatCard = document.createElement('div');
+                chatCard.classList.add('card');
+                chatCard.textContent = "Chat with ID = " + chat.chatId;
+                chatGrid.appendChild(chatCard);
+            });
+        };
+    });
+</script>
 </html>

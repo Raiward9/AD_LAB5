@@ -1,4 +1,5 @@
 import ChatMessage from '../models/chatMessage.model.js';
+import ChatUser from '../models/chatUser.model.js';
 
 import {errorHandler} from '../utils/error.js';
 
@@ -42,3 +43,42 @@ export const storeMessageInDatabase = async (message) => {
         console.error('Error storing message:', error);
     }
 }
+
+export const newChat = async (req, res, next) => {
+    const {username} = req.body;
+    console.log('New chat for:', username);
+    let chatId;
+    try {
+        const maxChatId = await ChatUser.aggregate([
+            {
+                $sort: { chatId: -1 }  
+            },
+            {
+                $limit: 1  
+            },
+            {
+                $project: { chatId: 1, _id: 0 }
+            }  
+        ])
+        if (maxChatId.length == 0) {
+            const allChats = await ChatUser.find({username}).sort({CreationDate: 1});
+            if (!allChats) {
+                return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({message: 'Error getting max chatId'});
+            }
+            else  chatId = 1;
+            //return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({message: 'Error getting max chatId'});
+        }
+        else  chatId = maxChatId[0].chatId + 1;
+    } catch (error) {
+        next(errorHandler(res, error));
+    }
+    const newChat = new ChatUser({chatId, username});
+
+    try {
+        await newChat.save();
+        res.status(statusCodes.CREATED).json({message: 'New Chat created or user added to chat', newChat: newChat});
+    } catch (error) {
+        next(errorHandler(res, error));
+    }
+}
+
