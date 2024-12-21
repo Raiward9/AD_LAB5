@@ -61,7 +61,7 @@ export const newChat = async (req, res, next) => {
             }  
         ])
         if (maxChatId.length == 0) {
-            const allChats = await ChatUser.find({username}).sort({CreationDate: 1});
+            const allChats = await ChatUser.find();
             if (!allChats) {
                 return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({message: 'Error getting max chatId'});
             }
@@ -81,4 +81,3 @@ export const newChat = async (req, res, next) => {
         next(errorHandler(res, error));
     }
 }
-

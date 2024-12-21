@@ -7,11 +7,11 @@ import {statusCodes} from '../utils/statusCodes.js';
 
 export const getChats = async (req, res, next) => {
     try {
-        const chats = await ChatUser.find();
+        const username = req.params.username;
+        const chats = await ChatUser.find({username}).sort({CreationDate: 1});
         if (!chats) {
             return res.status(statusCodes.NO_CONTENT).json(chats);
         }
-        console.log(chats)
         res
         .status(statusCodes.OK)
         .json(chats);
