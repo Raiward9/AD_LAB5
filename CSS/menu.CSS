@@ -7,14 +7,14 @@
   body {
     font-family: 'Roboto', sans-serif;
     display: flex;
-    justify-content: center;  /* Centra el contenido horizontalmente */
-    align-items: center;      /* Centra el contenido verticalmente */
-    height: 100vh;            /* Asegura que la pantalla ocupe toda la altura */
-    background-color: #f4f4f4; /* Fondo suave para la página */
+    justify-content: center; 
+    align-items: center;     
+    height: 100vh;           
+    background-color: #f4f4f4;
   }
   
   .header {
-    position: fixed; /* Fija el header en la parte superior */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -27,23 +27,23 @@
   }
   
   .navigation {
-    display: flex; /* Configura el contenedor como flexbox */
-    justify-content: space-between; /* Opcional: centra los elementos horizontalmente */
-    gap: 20px; /* Espaciado entre elementos */
-    background-color: #333; /* Fondo del nav */
-    padding: 10px; /* Espaciado interno */
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    background-color: #333;
+    padding: 10px;
   }
   
   .navigation a {
-    color: white; /* Color del texto */
-    text-decoration: none; /* Elimina el subrayado */
-    padding: 5px 10px; /* Espaciado interno de los enlaces */
-    transition: background-color 0.3s; /* Efecto suave al pasar el mouse */
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    transition: background-color 0.3s;
   }
   
   .navigation a:hover {
-    background-color: #555; /* Fondo al pasar el mouse */
-    border-radius: 5px; /* Bordes redondeados */
+    background-color: #555;
+    border-radius: 5px;
   }
 
 .card {
@@ -77,12 +77,12 @@
 
   .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Ajuste automático de columnas */
-    grid-auto-rows: minmax(100px, auto); /* Altura mínima dinámica para las filas */
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-auto-rows: minmax(100px, auto);
     gap: 40px;
     max-width: 1200px;
-    max-height: 500px; /* Establece la altura máxima para el contenedor */
-    overflow-y: auto; /* Habilita el scroll vertical cuando el contenido excede el alto */
+    max-height: 500px;
+    overflow-y: auto;
     padding: 50px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }

@@ -7,14 +7,14 @@
 body {
   font-family: 'Roboto', sans-serif;
   display: flex;
-  justify-content: center;  /* Centra el contenido horizontalmente */
-  align-items: center;      /* Centra el contenido verticalmente */
-  height: 100vh;            /* Asegura que la pantalla ocupe toda la altura */
-  background-color: #f4f4f4; /* Fondo suave para la página */
+  justify-content: center; 
+  align-items: center;     
+  height: 100vh;           
+  background-color: #f4f4f4;
 }
 
 .header {
-  position: fixed; /* Fija el header en la parte superior */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -27,23 +27,23 @@ body {
 }
 
 .navigation {
-  display: flex; /* Configura el contenedor como flexbox */
-  justify-content: space-between; /* Opcional: centra los elementos horizontalmente */
-  gap: 20px; /* Espaciado entre elementos */
-  background-color: #333; /* Fondo del nav */
-  padding: 10px; /* Espaciado interno */
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background-color: #333;
+  padding: 10px;
 }
 
 .navigation a {
-  color: white; /* Color del texto */
-  text-decoration: none; /* Elimina el subrayado */
-  padding: 5px 10px; /* Espaciado interno de los enlaces */
-  transition: background-color 0.3s; /* Efecto suave al pasar el mouse */
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+  transition: background-color 0.3s;
 }
 
 .navigation a:hover {
-  background-color: #555; /* Fondo al pasar el mouse */
-  border-radius: 5px; /* Bordes redondeados */
+  background-color: #555;
+  border-radius: 5px;
 }
 
 
@@ -102,13 +102,13 @@ body {
   }
 
   .message img {
-    max-width: 100%; /* Asegura que la imagen no exceda el ancho del contenedor */
-    max-height: 150px; /* Define la altura máxima para las imágenes */
-    width: auto; /* Mantiene la proporción del ancho */
-    height: auto; /* Mantiene la proporción de la altura */
-    border-radius: 5px; /* Opcional: redondea las esquinas de las imágenes */
-    display: block; /* Asegura que las imágenes no generen espacios adicionales */
-    margin: 5px auto; /* Centra la imagen horizontalmente */
+    max-width: 100%;
+    max-height: 150px;
+    width: auto;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+    margin: 5px auto;
 }
   
   .chat-footer {
@@ -166,12 +166,12 @@ body {
 
   .main-container {
     display: flex;
-    flex-direction: column; /* Asegura que los elementos estén en una columna */
-    gap: 20px; /* Espacio entre el formulario y el chat */
-    padding: 20px; /* Margen interior para un diseño limpio */
-    width: 35%; /* Ocupa el 90% del ancho de la pantalla */
-    max-width: 1200px; /* Define un ancho máximo más grande */
-    margin: 0 auto; /* Centra el contenedor en la página */
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    width: 35%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 
@@ -179,7 +179,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Espacio entre elementos */
+  gap: 10px;
   background-color: #f4f4f4;
   padding: 15px;
   border-radius: 8px;

@@ -1,4 +1,4 @@
-/* General Reset */
+
 * {
   margin: 0;
   padding: 0;
@@ -8,10 +8,10 @@
 body {
   font-family: 'Roboto', sans-serif;
   display: flex;
-  justify-content: center;  /* Centra el contenido horizontalmente */
-  align-items: center;      /* Centra el contenido verticalmente */
-  height: 100vh;            /* Asegura que la pantalla ocupe toda la altura */
-  background-color: #f4f4f4; /* Fondo suave para la página */
+  justify-content: center; 
+  align-items: center;     
+  height: 100vh;           
+  background-color: #f4f4f4;
 }
 
 h1 {
